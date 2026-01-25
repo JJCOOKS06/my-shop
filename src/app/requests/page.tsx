@@ -21,21 +21,30 @@ export default function RequestsPage() {
     let imageUrl: string | null = null;
 
     if (file) {
-      // Step 2 will create this endpoint
       const form = new FormData();
       form.append("file", file);
 
       const up = await fetch("/api/upload", { method: "POST", body: form });
-      const upJson = await up.json();
-      imageUrl = upJson?.url ?? null;
+
+      let upJson: any = null;
+      try {
+        upJson = await up.json();
+      } catch {
+        upJson = null;
+      }
 
       if (!up.ok) {
-        setStatus("Image upload failed ❌");
+        setStatus(
+          `Image upload failed ❌: ${upJson?.error ?? "Server error (non‑JSON)"}`
+        );
         return;
       }
+
+      imageUrl = upJson?.url ?? null;
     }
 
     setStatus("Sending request...");
+
     const r = await fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
