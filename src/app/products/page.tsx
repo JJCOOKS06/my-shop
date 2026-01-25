@@ -9,6 +9,7 @@ export default function ProductsPage() {
     () => Object.fromEntries(products.map((p) => [p.id, 1])),
     []
   );
+
   const [qty, setQty] = useState<Record<string, number>>(initialQty);
   const [addedId, setAddedId] = useState<string | null>(null);
 
@@ -42,7 +43,9 @@ export default function ProductsPage() {
                   min={1}
                   max={20}
                   value={qty[p.id] ?? 1}
-                  onChange={(e) => setProductQty(p.id, Number(e.target.value))}
+                  onChange={(e) =>
+                    setProductQty(p.id, Number(e.target.value))
+                  }
                   className="ml-2 w-20 rounded-md border p-2"
                 />
               </label>
@@ -50,7 +53,12 @@ export default function ProductsPage() {
               <button
                 onClick={() => {
                   addToCart(
-                    { id: p.id, title: p.title, price: p.price, image: p.image },
+                    {
+                      id: p.id,
+                      title: p.title,
+                      price: p.price,
+                      image: p.image,
+                    },
                     qty[p.id] ?? 1
                   );
                   setAddedId(p.id);
@@ -71,4 +79,5 @@ export default function ProductsPage() {
     </main>
   );
 }
+
 
