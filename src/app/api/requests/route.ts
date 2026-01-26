@@ -23,22 +23,11 @@ export async function POST(req: Request) {
     const toEmail = process.env.REQUESTS_TO_EMAIL;
 
     if (!resendKey || !toEmail) {
-      // This is why the page says "Request sent ✅" but NOT "(email sent)"
-      console.log("NEW REQUEST (email not configured):", {
-        name,
-        itemName,
-        details,
-        contact,
-        imageUrl,
-        hasResendKey: !!resendKey,
-        hasToEmail: !!toEmail,
-      });
-
       return Response.json(
         {
           ok: true,
           emailed: false,
-          error: "Email not configured on Vercel (missing RESEND_API_KEY or REQUESTS_TO_EMAIL in Production).",
+          error: "Email not configured: missing RESEND_API_KEY or REQUESTS_TO_EMAIL in Vercel (Production).",
         },
         { status: 200 }
       );
@@ -46,32 +35,26 @@ export async function POST(req: Request) {
 
     const resend = new Resend(resendKey);
 
-    const subject = `New Request: ${itemName} (from ${name})`;
-
-    const html = `
-      <div style="font-family: ui-sans-serif, system-ui; line-height: 1.5">
-        <h2>New Request</h2>
-        <p><b>Name:</b> ${escapeHtml(name)}</p>
-        <p><b>Item:</b> ${escapeHtml(itemName)}</p>
-        <p><b>Details:</b><br/>${escapeHtml(details).replace(/\n/g, "<br/>")}</p>
-        <p><b>Contact:</b> ${escapeHtml(contact)}</p>
-        ${
-          imageUrl
-            ? `<p><b>Image URL:</b> <a href="${imageUrl}">${imageUrl}</a></p>
-               <img src="${imageUrl}" style="max-width:480px;border-radius:12px;border:1px solid #ddd" />`
-            : "<p><b>Image:</b> (none)</p>"
-        }
-      </div>
-    `;
-
     const result = await resend.emails.send({
       from: "My Shop <onboarding@resend.dev>",
       to: toEmail,
-      subject,
-      html,
+      subject: `New Request: ${itemName} (from ${name})`,
+      html: `
+        <div style="font-family: ui-sans-serif, system-ui; line-height: 1.5">
+          <h2>New Request</h2>
+          <p><b>Name:</b> ${escapeHtml(name)}</p>
+          <p><b>Item:</b> ${escapeHtml(itemName)}</p>
+          <p><b>Details:</b><br/>${escapeHtml(details).replace(/\n/g, "<br/>")}</p>
+          <p><b>Contact:</b> ${escapeHtml(contact)}</p>
+          ${
+            imageUrl
+              ? `<p><b>Image URL:</b> <a href="${imageUrl}">${imageUrl}</a></p>`
+              : "<p><b>Image:</b> (none)</p>"
+          }
+        </div>
+      `,
     });
 
-    // If Resend returns an error, show it clearly
     if ((result as any)?.error) {
       return Response.json(
         { ok: false, emailed: false, error: (result as any).error.message ?? "Resend error" },
