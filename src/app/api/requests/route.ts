@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     if (!name || !itemName || !contact) {
       return Response.json(
-        { ok: false, error: "Missing required fields: name, itemName, contact" },
+        { ok: false, emailed: false, error: "Missing required fields: name, itemName, contact" },
         { status: 400 }
       );
     }
@@ -22,16 +22,26 @@ export async function POST(req: Request) {
     const resendKey = process.env.RESEND_API_KEY;
     const toEmail = process.env.REQUESTS_TO_EMAIL;
 
-    // If env vars aren’t set yet, don’t crash — just log it
     if (!resendKey || !toEmail) {
+      // This is why the page says "Request sent ✅" but NOT "(email sent)"
       console.log("NEW REQUEST (email not configured):", {
         name,
         itemName,
         details,
         contact,
         imageUrl,
+        hasResendKey: !!resendKey,
+        hasToEmail: !!toEmail,
       });
-      return Response.json({ ok: true, emailed: false });
+
+      return Response.json(
+        {
+          ok: true,
+          emailed: false,
+          error: "Email not configured on Vercel (missing RESEND_API_KEY or REQUESTS_TO_EMAIL in Production).",
+        },
+        { status: 200 }
+      );
     }
 
     const resend = new Resend(resendKey);
@@ -54,18 +64,25 @@ export async function POST(req: Request) {
       </div>
     `;
 
-    // Note: this default sender works for testing. Later we can verify your domain and change it.
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "My Shop <onboarding@resend.dev>",
       to: toEmail,
       subject,
       html,
     });
 
-    return Response.json({ ok: true, emailed: true });
+    // If Resend returns an error, show it clearly
+    if ((result as any)?.error) {
+      return Response.json(
+        { ok: false, emailed: false, error: (result as any).error.message ?? "Resend error" },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({ ok: true, emailed: true }, { status: 200 });
   } catch (err: any) {
     return Response.json(
-      { ok: false, error: err?.message ?? "Request failed" },
+      { ok: false, emailed: false, error: err?.message ?? "Request failed" },
       { status: 500 }
     );
   }
