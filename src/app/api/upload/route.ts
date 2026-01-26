@@ -2,15 +2,28 @@ export const runtime = "nodejs";
 
 import { put } from "@vercel/blob";
 
+export async function GET() {
+  // Safe debug endpoint (does NOT expose the token)
+  return Response.json(
+    {
+      ok: true,
+      route: "/api/upload",
+      runtime: "nodejs",
+      hasBlobToken: !!process.env.BLOB_READ_WRITE_TOKEN,
+      note: "If hasBlobToken is false, Vercel isn't providing env vars to this deployment.",
+    },
+    { status: 200 }
+  );
+}
+
 export async function POST(req: Request) {
   try {
-    // Debug: confirm token is visible at runtime
     const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
     if (!hasToken) {
       return Response.json(
         {
           error:
-            "BLOB_READ_WRITE_TOKEN is missing at runtime (Vercel function can't see it). Redeploy after setting env var, and ensure this route runs on Node.",
+            "BLOB_READ_WRITE_TOKEN is missing at runtime. Check Vercel env vars (Production) and Redeploy.",
         },
         { status: 500 }
       );
@@ -24,7 +37,6 @@ export async function POST(req: Request) {
     }
 
     const blob = await put(file.name, file, { access: "public" });
-
     return Response.json({ url: blob.url }, { status: 200 });
   } catch (err: any) {
     return Response.json(
@@ -33,4 +45,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
