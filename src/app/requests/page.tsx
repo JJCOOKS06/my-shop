@@ -51,7 +51,19 @@ export default function RequestsPage() {
       body: JSON.stringify({ name, itemName, details, contact, imageUrl }),
     });
 
-    setStatus(r.ok ? "Request sent ✅" : "Request failed ❌");
+    let rJson: any = null;
+    try {
+      rJson = await r.json();
+    } catch {
+      rJson = null;
+    }
+
+    if (!r.ok) {
+      setStatus(`Request failed ❌: ${rJson?.error ?? "Server error"}`);
+      return;
+    }
+
+    setStatus(rJson?.emailed ? "Request sent ✅ (email sent)" : "Request sent ✅");
   }
 
   return (

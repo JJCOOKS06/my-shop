@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
@@ -10,7 +12,8 @@ export async function POST(req: Request) {
     }
 
     const blob = await put(file.name, file, { access: "public" });
-    return Response.json({ url: blob.url });
+
+    return Response.json({ url: blob.url }, { status: 200 });
   } catch (err: any) {
     return Response.json(
       { error: err?.message ?? "Upload failed" },
