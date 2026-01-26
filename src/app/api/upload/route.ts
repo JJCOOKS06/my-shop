@@ -4,6 +4,18 @@ import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
   try {
+    // Debug: confirm token is visible at runtime
+    const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+    if (!hasToken) {
+      return Response.json(
+        {
+          error:
+            "BLOB_READ_WRITE_TOKEN is missing at runtime (Vercel function can't see it). Redeploy after setting env var, and ensure this route runs on Node.",
+        },
+        { status: 500 }
+      );
+    }
+
     const form = await req.formData();
     const file = form.get("file");
 
@@ -21,3 +33,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
