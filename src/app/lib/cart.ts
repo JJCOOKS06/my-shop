@@ -46,6 +46,12 @@ export function setCartItemQuantity(
   saveCart(cart);
 }
 
+export function removeFromCart(id: string) {
+  const cart = getCart();
+  const filtered = cart.filter((c) => c.id !== id);
+  saveCart(filtered);
+}
+
 export function clearCart() {
   localStorage.removeItem(CART_KEY);
   notifyCartUpdated();
