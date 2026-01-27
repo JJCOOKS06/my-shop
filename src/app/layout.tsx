@@ -32,8 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="mx-auto max-w-5xl p-6">{children}</main>
 
           <footer className="border-t">
-            <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 p-4 text-sm text-gray-600">
-              <span>Contact us at:</span>
+            <div className="mx-auto max-w-5xl p-4 text-center text-sm text-gray-600">
+              Contact us at{" "}
               <a
                 href="mailto:info@regarm.uk"
                 className="font-medium text-black underline"
