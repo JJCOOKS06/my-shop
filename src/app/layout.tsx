@@ -4,6 +4,7 @@ import "./globals.css";
 
 import Navbar from "./components/Navbar";
 import LangDirSync from "./components/LangDirSync";
+import { AppSettingsProvider } from "./components/AppSettingsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,18 +21,17 @@ export const metadata: Metadata = {
   description: "Online clothing store",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <LangDirSync />
-        <Navbar />
-        {children}
+        <AppSettingsProvider>
+          <LangDirSync />
+          <Navbar />
+          {children}
+        </AppSettingsProvider>
       </body>
     </html>
   );
 }
+

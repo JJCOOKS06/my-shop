@@ -1,54 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useAppSettings } from "../components/AppSettingsProvider";
+import { T } from "../lib/lang";
 
 export default function RequestsPage() {
+  const { lang } = useAppSettings();
+
   const [name, setName] = useState("");
   const [itemName, setItemName] = useState("");
   const [details, setDetails] = useState("");
   const [contact, setContact] = useState("");
-  const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
-  const previewUrl = useMemo(() => {
-    if (!file) return null;
-    return URL.createObjectURL(file);
-  }, [file]);
-
   async function submit() {
-    setStatus("Uploading image...");
-
-    let imageUrl: string | null = null;
-
-    if (file) {
-      const form = new FormData();
-      form.append("file", file);
-
-      const up = await fetch("/api/upload", { method: "POST", body: form });
-
-      let upJson: any = null;
-      try {
-        upJson = await up.json();
-      } catch {
-        upJson = null;
-      }
-
-      if (!up.ok) {
-        setStatus(
-          `Image upload failed ❌: ${upJson?.error ?? "Server error (non‑JSON)"}`
-        );
-        return;
-      }
-
-      imageUrl = upJson?.url ?? null;
-    }
-
-    setStatus("Sending request...");
+    setStatus(T.requests.sending[lang]);
 
     const r = await fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, itemName, details, contact, imageUrl }),
+      body: JSON.stringify({ name, itemName, details, contact }),
     });
 
     let rJson: any = null;
@@ -63,19 +34,18 @@ export default function RequestsPage() {
       return;
     }
 
-    setStatus(rJson?.emailed ? "Request sent ✅ (email sent)" : "Request sent ✅");
+    if (rJson?.emailed) setStatus("Request sent ✅ (email sent)");
+    else setStatus(`Request sent ✅ (email NOT sent): ${rJson?.note ?? "Unknown"}`);
   }
 
   return (
     <main className="mx-auto max-w-3xl p-6">
-      <h1 className="text-3xl font-bold">Requests</h1>
-      <p className="mt-2 text-gray-600">
-        Request an item and we’ll try to get it for you.
-      </p>
+      <h1 className="text-3xl font-bold">{T.requests.title[lang]}</h1>
+      <p className="mt-2 text-gray-600">{T.requests.subtitle[lang]}</p>
 
       <div className="mt-6 space-y-4 rounded-xl border p-4">
         <label className="block text-sm">
-          Your name
+          {T.requests.name[lang]}
           <input
             className="mt-1 w-full rounded-md border p-2"
             value={name}
@@ -84,7 +54,7 @@ export default function RequestsPage() {
         </label>
 
         <label className="block text-sm">
-          Item name
+          {T.requests.item[lang]}
           <input
             className="mt-1 w-full rounded-md border p-2"
             value={itemName}
@@ -93,7 +63,7 @@ export default function RequestsPage() {
         </label>
 
         <label className="block text-sm">
-          Details (colour, size, etc.)
+          {T.requests.details[lang]}
           <textarea
             className="mt-1 w-full rounded-md border p-2"
             rows={4}
@@ -103,7 +73,7 @@ export default function RequestsPage() {
         </label>
 
         <label className="block text-sm">
-          Contact info (email or phone)
+          {T.requests.contact[lang]}
           <input
             className="mt-1 w-full rounded-md border p-2"
             value={contact}
@@ -111,30 +81,8 @@ export default function RequestsPage() {
           />
         </label>
 
-        <label className="block text-sm">
-          Upload an image (optional)
-          <input
-            className="mt-1 w-full"
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </label>
-
-        {previewUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={previewUrl}
-            alt="Preview"
-            className="w-full rounded-lg border object-cover"
-          />
-        )}
-
-        <button
-          onClick={submit}
-          className="w-full rounded-lg bg-black px-4 py-2 text-white"
-        >
-          Submit request
+        <button onClick={submit} className="w-full rounded-lg bg-black px-4 py-2 text-white">
+          {T.requests.submit[lang]}
         </button>
 
         {status && <p className="text-sm text-gray-700">{status}</p>}

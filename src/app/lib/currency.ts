@@ -2,9 +2,10 @@ export type Currency = "GBP" | "EUR";
 
 const KEY = "currency";
 
+// simple fixed rates for now (you can update later)
 const RATES: Record<Currency, number> = {
   GBP: 1,
-  EUR: 1.17, // simple fixed rate for now
+  EUR: 1.17,
 };
 
 const SYMBOL: Record<Currency, string> = {
@@ -22,8 +23,7 @@ export function setCurrency(c: Currency) {
   window.dispatchEvent(new Event("currency:updated"));
 }
 
-export function formatPrice(gbpPrice: number): string {
-  const currency = getCurrency();
-  const converted = gbpPrice * RATES[currency];
+export function formatPriceGBP(gbp: number, currency: Currency): string {
+  const converted = gbp * RATES[currency];
   return `${SYMBOL[currency]}${converted.toFixed(2)}`;
 }
