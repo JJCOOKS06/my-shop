@@ -1,28 +1,29 @@
 export type Currency = "GBP" | "EUR";
+
 const KEY = "currency";
 
-function notify() {
-  window.dispatchEvent(new Event("currency:updated"));
-}
+const RATES: Record<Currency, number> = {
+  GBP: 1,
+  EUR: 1.17, // simple fixed rate for now
+};
+
+const SYMBOL: Record<Currency, string> = {
+  GBP: "£",
+  EUR: "€",
+};
 
 export function getCurrency(): Currency {
   if (typeof window === "undefined") return "GBP";
   return (localStorage.getItem(KEY) as Currency) || "GBP";
 }
 
-export function setCurrency(cur: Currency) {
-  localStorage.setItem(KEY, cur);
-  notify();
+export function setCurrency(c: Currency) {
+  localStorage.setItem(KEY, c);
+  window.dispatchEvent(new Event("currency:updated"));
 }
 
-export async function getGbpToEurRate(): Promise<{ rate: number; date: string } | null> {
-  const res = await fetch("/api/rates");
-  const data = await res.json();
-  if (!data?.ok) return null;
-  return { rate: data.rates.EUR, date: data.date };
-}
-
-export function formatMoney(amount: number, currency: Currency) {
-  const symbol = currency === "GBP" ? "£" : "€";
-  return `${symbol}${amount.toFixed(2)}`;
+export function formatPrice(gbpPrice: number): string {
+  const currency = getCurrency();
+  const converted = gbpPrice * RATES[currency];
+  return `${SYMBOL[currency]}${converted.toFixed(2)}`;
 }
