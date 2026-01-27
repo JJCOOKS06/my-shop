@@ -16,12 +16,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/* ✅ SITE METADATA (THIS IS THE IMPORTANT PART) */
 export const metadata: Metadata = {
   title: "Regarm.uk",
   description: "All your favourite products, at a fraction of the price.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
