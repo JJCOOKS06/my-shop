@@ -22,6 +22,18 @@ export default function CartPage() {
 
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
+  function setQty(item: CartItem, nextQty: number) {
+    setCartItemQuantity(
+      {
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        image: item.image,
+      },
+      nextQty
+    );
+  }
+
   return (
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">Cart</h1>
@@ -49,32 +61,35 @@ export default function CartPage() {
                     £{item.price.toFixed(2)} each
                   </div>
 
-                  <div className="mt-2 flex items-center gap-3">
-                    <label className="text-sm text-gray-600">
-                      Qty
-                      <input
-                        type="number"
-                        min={0}
-                        max={20}
-                        value={item.quantity}
-                        onChange={(e) =>
-                          setCartItemQuantity(
-                            {
-                              id: item.id,
-                              title: item.title,
-                              price: item.price,
-                              image: item.image,
-                            },
-                            Number(e.target.value)
-                          )
-                        }
-                        className="ml-2 w-20 rounded-md border p-2"
-                      />
-                    </label>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      className="rounded-md border px-3 py-2"
+                      onClick={() => setQty(item, item.quantity - 1)} // if hits 0, it removes
+                      aria-label="Decrease quantity"
+                    >
+                      −
+                    </button>
+
+                    <input
+                      type="number"
+                      min={0}
+                      max={20}
+                      value={item.quantity}
+                      onChange={(e) => setQty(item, Number(e.target.value))}
+                      className="w-20 rounded-md border p-2 text-center"
+                    />
+
+                    <button
+                      className="rounded-md border px-3 py-2"
+                      onClick={() => setQty(item, item.quantity + 1)}
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
 
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="rounded-lg border px-3 py-2 text-sm"
+                      className="ml-2 rounded-md border px-3 py-2"
                     >
                       Remove
                     </button>
