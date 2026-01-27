@@ -9,7 +9,6 @@ export type CartItem = {
 const CART_KEY = "cart";
 
 function notifyCartUpdated() {
-  // lets React pages re-render when cart changes
   window.dispatchEvent(new Event("cart:updated"));
 }
 
@@ -19,15 +18,32 @@ export function getCart(): CartItem[] {
   return raw ? JSON.parse(raw) : [];
 }
 
-export function addToCart(item: Omit<CartItem, "quantity">, quantity = 1) {
+function saveCart(cart: CartItem[]) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  notifyCartUpdated();
+}
+
+export function setCartItemQuantity(
+  item: Omit<CartItem, "quantity">,
+  quantity: number
+) {
   const cart = getCart();
   const existing = cart.find((c) => c.id === item.id);
 
-  if (existing) existing.quantity += quantity;
-  else cart.push({ ...item, quantity });
+  // Quantity 0 → remove
+  if (quantity <= 0) {
+    const filtered = cart.filter((c) => c.id !== item.id);
+    saveCart(filtered);
+    return;
+  }
 
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  notifyCartUpdated();
+  if (existing) {
+    existing.quantity = quantity;
+  } else {
+    cart.push({ ...item, quantity });
+  }
+
+  saveCart(cart);
 }
 
 export function clearCart() {

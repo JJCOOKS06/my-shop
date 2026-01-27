@@ -2,20 +2,38 @@
 
 import { useMemo, useState } from "react";
 import { products } from "../data/products";
-import { addToCart } from "../lib/cart";
+import { setCartItemQuantity } from "../lib/cart";
 
 export default function ProductsPage() {
   const initialQty = useMemo(
-    () => Object.fromEntries(products.map((p) => [p.id, 1])),
+    () => Object.fromEntries(products.map((p) => [p.id, 0])),
     []
   );
 
   const [qty, setQty] = useState<Record<string, number>>(initialQty);
-  const [addedId, setAddedId] = useState<string | null>(null);
+  const [updatedId, setUpdatedId] = useState<string | null>(null);
 
-  function setProductQty(id: string, value: number) {
-    const v = Number.isFinite(value) ? value : 1;
-    setQty((q) => ({ ...q, [id]: Math.max(1, Math.min(20, v)) }));
+  function updateQty(id: string, value: number) {
+    const v = Number.isFinite(value) ? value : 0;
+    const safe = Math.max(0, Math.min(20, v));
+
+    setQty((q) => ({ ...q, [id]: safe }));
+
+    const product = products.find((p) => p.id === id);
+    if (!product) return;
+
+    setCartItemQuantity(
+      {
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+      },
+      safe
+    );
+
+    setUpdatedId(id);
+    setTimeout(() => setUpdatedId(null), 800);
   }
 
   return (
@@ -40,38 +58,21 @@ export default function ProductsPage() {
                 Qty
                 <input
                   type="number"
-                  min={1}
+                  min={0}
                   max={20}
-                  value={qty[p.id] ?? 1}
+                  value={qty[p.id] ?? 0}
                   onChange={(e) =>
-                    setProductQty(p.id, Number(e.target.value))
+                    updateQty(p.id, Number(e.target.value))
                   }
                   className="ml-2 w-20 rounded-md border p-2"
                 />
               </label>
-
-              <button
-                onClick={() => {
-                  addToCart(
-                    {
-                      id: p.id,
-                      title: p.title,
-                      price: p.price,
-                      image: p.image,
-                    },
-                    qty[p.id] ?? 1
-                  );
-                  setAddedId(p.id);
-                  setTimeout(() => setAddedId(null), 900);
-                }}
-                className="flex-1 rounded-lg bg-black px-4 py-2 text-white"
-              >
-                Add to cart
-              </button>
             </div>
 
-            {addedId === p.id && (
-              <p className="mt-2 text-sm text-green-700">Added ✅</p>
+            {updatedId === p.id && (
+              <p className="mt-2 text-sm text-green-700">
+                {qty[p.id] === 0 ? "Removed 🗑️" : "Updated ✅"}
+              </p>
             )}
           </div>
         ))}
@@ -79,5 +80,3 @@ export default function ProductsPage() {
     </main>
   );
 }
-
-
