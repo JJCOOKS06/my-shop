@@ -21,7 +21,8 @@ export const T = {
   nav: {
     home: { ENG: "Home", FRA: "Accueil", ARA: "الرئيسية" },
     products: { ENG: "Products", FRA: "Produits", ARA: "المنتجات" },
-    requests: { ENG: "Requests", FRA: "طلبات", ARA: "طلبات" },
+    // ✅ FIXED: French was accidentally Arabic before
+    requests: { ENG: "Requests", FRA: "Demandes", ARA: "الطلبات" },
     cart: { ENG: "Cart", FRA: "Panier", ARA: "السلة" },
   },
 
@@ -60,8 +61,16 @@ export const T = {
     },
     name: { ENG: "Your name", FRA: "Votre nom", ARA: "اسمك" },
     item: { ENG: "Item name", FRA: "Nom de l'article", ARA: "اسم المنتج" },
-    details: { ENG: "Details (colour, size, etc.)", FRA: "Détails (couleur, taille…)", ARA: "تفاصيل (اللون، المقاس…)" },
-    contact: { ENG: "Contact info (email or phone)", FRA: "Contact (email ou téléphone)", ARA: "معلومات التواصل (إيميل أو رقم)" },
+    details: {
+      ENG: "Details (colour, size, etc.)",
+      FRA: "Détails (couleur, taille…)",
+      ARA: "تفاصيل (اللون، المقاس…)",
+    },
+    contact: {
+      ENG: "Contact info (email or phone)",
+      FRA: "Contact (email ou téléphone)",
+      ARA: "معلومات التواصل (إيميل أو رقم)",
+    },
     submit: { ENG: "Submit request", FRA: "Envoyer la demande", ARA: "إرسال الطلب" },
     sending: { ENG: "Sending request...", FRA: "Envoi en cours...", ARA: "جارٍ الإرسال..." },
   },
