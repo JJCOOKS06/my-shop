@@ -21,11 +21,7 @@ export const metadata: Metadata = {
   description: "Online clothing store",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -33,17 +29,18 @@ export default function RootLayout({
           <LangDirSync />
           <Navbar />
 
-          <div className="min-h-[80vh]">{children}</div>
+          <main className="mx-auto max-w-5xl p-6">{children}</main>
 
-          {/* Footer */}
-          <footer className="mt-12 border-t py-6 text-center text-sm text-gray-600">
-            Contact us at{" "}
-            <a
-              href="mailto:info@regarm.uk"
-              className="font-medium text-black underline"
-            >
-              info@regarm.uk
-            </a>
+          <footer className="border-t">
+            <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 p-4 text-sm text-gray-600">
+              <span>Contact us at:</span>
+              <a
+                href="mailto:info@regarm.uk"
+                className="font-medium text-black underline"
+              >
+                info@regarm.uk
+              </a>
+            </div>
           </footer>
         </AppSettingsProvider>
       </body>
