@@ -12,28 +12,41 @@ export function setLang(lang: Lang) {
   window.dispatchEvent(new Event("lang:updated"));
 }
 
+/**
+ * NOTE:
+ * Brand name (Regarm.uk) is NOT translated.
+ * Only descriptive text is translated.
+ */
 export const T = {
   brand: {
-    ENG: "My Clothing Store",
-    FRA: "Ma Boutique",
-    ARA: "متجر الملابس",
+    ENG: "Regarm.uk",
+    FRA: "Regarm.uk",
+    ARA: "Regarm.uk",
   },
+
   nav: {
     home: { ENG: "Home", FRA: "Accueil", ARA: "الرئيسية" },
     products: { ENG: "Products", FRA: "Produits", ARA: "المنتجات" },
-    // ✅ FIXED: French was accidentally Arabic before
     requests: { ENG: "Requests", FRA: "Demandes", ARA: "الطلبات" },
     cart: { ENG: "Cart", FRA: "Panier", ARA: "السلة" },
   },
 
   home: {
-    title: { ENG: "My Clothing Store 👕", FRA: "Ma Boutique 👕", ARA: "متجر الملابس 👕" },
-    tagline: {
-      ENG: "Discover everyday essentials designed for comfort and style.",
-      FRA: "Découvrez des essentiels du quotidien alliant confort et style.",
-      ARA: "اكتشف أساسيات يومية مصممة للراحة والأناقة.",
+    title: {
+      ENG: "Regarm.uk",
+      FRA: "Regarm.uk",
+      ARA: "Regarm.uk",
     },
-    shop: { ENG: "Shop Products", FRA: "Voir les produits", ARA: "تسوق المنتجات" },
+    tagline: {
+      ENG: "All your favourite products, at a fraction of the price.",
+      FRA: "Tous vos produits préférés, à une fraction du prix.",
+      ARA: "كل منتجاتك المفضلة، بجزء من السعر.",
+    },
+    shop: {
+      ENG: "Shop Products",
+      FRA: "Voir les produits",
+      ARA: "تسوق المنتجات",
+    },
   },
 
   products: {
@@ -44,7 +57,11 @@ export const T = {
 
   cart: {
     title: { ENG: "Cart", FRA: "Panier", ARA: "السلة" },
-    empty: { ENG: "Your cart is empty.", FRA: "Votre panier est vide.", ARA: "سلتك فارغة." },
+    empty: {
+      ENG: "Your cart is empty.",
+      FRA: "Votre panier est vide.",
+      ARA: "سلتك فارغة.",
+    },
     itemTotal: { ENG: "Item total", FRA: "Total", ARA: "إجمالي المنتج" },
     total: { ENG: "Total", FRA: "Total", ARA: "الإجمالي" },
     clear: { ENG: "Clear cart", FRA: "Vider le panier", ARA: "تفريغ السلة" },
