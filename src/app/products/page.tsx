@@ -1,9 +1,3 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Products | Regarm.uk",
-};
-
 "use client";
 
 import { useState } from "react";
@@ -41,7 +35,11 @@ export default function ProductsPage() {
           return (
             <div key={p.id} className="rounded-xl border p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.image} alt={p.title} className="h-56 w-full rounded-lg object-cover" />
+              <img
+                src={p.image}
+                alt={p.title}
+                className="h-56 w-full rounded-lg object-cover"
+              />
 
               <h2 className="mt-3 font-medium">{p.title}</h2>
               <p className="text-sm text-gray-600">{formatPriceGBP(p.price, currency)}</p>

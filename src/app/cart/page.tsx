@@ -1,9 +1,3 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Cart | Regarm.uk",
-};
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -55,7 +49,11 @@ export default function CartPage() {
             {cart.map((item) => (
               <div key={item.id} className="flex items-center gap-4 rounded-lg border p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.image} alt={item.title} className="h-20 w-20 rounded object-cover" />
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-20 w-20 rounded object-cover"
+                />
 
                 <div className="flex-1">
                   <div className="font-medium">{item.title}</div>
@@ -64,7 +62,10 @@ export default function CartPage() {
                   </div>
 
                   <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <button className="rounded-md border px-3 py-2" onClick={() => setQty(item, item.quantity - 1)}>
+                    <button
+                      className="rounded-md border px-3 py-2"
+                      onClick={() => setQty(item, item.quantity - 1)}
+                    >
                       −
                     </button>
 
@@ -77,7 +78,10 @@ export default function CartPage() {
                       className="w-20 rounded-md border p-2 text-center"
                     />
 
-                    <button className="rounded-md border px-3 py-2" onClick={() => setQty(item, item.quantity + 1)}>
+                    <button
+                      className="rounded-md border px-3 py-2"
+                      onClick={() => setQty(item, item.quantity + 1)}
+                    >
                       +
                     </button>
 
