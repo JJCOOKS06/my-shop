@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Requests | Regarm.uk",
+};
+
 "use client";
 
 import { useState } from "react";

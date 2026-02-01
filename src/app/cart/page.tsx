@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cart | Regarm.uk",
+};
+
 "use client";
 
 import { useEffect, useState } from "react";
