@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import {
   getCart,
   clearCart,
@@ -15,11 +16,14 @@ import { formatPriceGBP } from "../lib/currency";
 export default function CartPage() {
   const { lang, currency } = useAppSettings();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [loadingPay, setLoadingPay] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const update = () => setCart(getCart());
     update();
 
+    // keep in sync with your existing cart events
     window.addEventListener("cart:updated", update);
     window.addEventListener("cart:changed", update);
     return () => {
@@ -28,13 +32,48 @@ export default function CartPage() {
     };
   }, []);
 
-  const totalGBP = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const totalGBP = useMemo(
+    () => cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    [cart]
+  );
 
   function setQty(item: CartItem, nextQty: number) {
     setCartItemQuantity(
       { id: item.id, title: item.title, price: item.price, image: item.image },
       nextQty
     );
+  }
+
+  async function payNow() {
+    setStatus(null);
+    setLoadingPay(true);
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus(data?.error ?? "Checkout failed");
+        setLoadingPay(false);
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setStatus("Checkout failed: missing Stripe URL");
+      setLoadingPay(false);
+    } catch (e: any) {
+      setStatus(e?.message ?? "Checkout error");
+      setLoadingPay(false);
+    }
   }
 
   return (
@@ -104,14 +143,34 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="mt-6 flex items-center justify-between">
-            <div className="font-medium">
-              {T.cart.total[lang]}: {formatPriceGBP(totalGBP, currency)}
+          <div className="mt-6 rounded-xl border p-4">
+            <div className="flex items-center justify-between">
+              <div className="font-medium">{T.cart.total[lang]}</div>
+              <div className="text-2xl font-bold">{formatPriceGBP(totalGBP, currency)}</div>
             </div>
 
-            <button onClick={() => clearCart()} className="rounded-lg border px-4 py-2">
-              {T.cart.clear[lang]}
-            </button>
+            {status && <p className="mt-3 text-sm text-red-600">{status}</p>}
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                onClick={payNow}
+                disabled={loadingPay}
+                className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-60"
+              >
+                {loadingPay ? "Redirecting..." : "Pay with card"}
+              </button>
+
+              <button
+                onClick={() => clearCart()}
+                className="rounded-lg border px-4 py-2"
+              >
+                {T.cart.clear[lang]}
+              </button>
+
+              <Link className="rounded-lg border px-4 py-2" href="/products">
+                Continue shopping
+              </Link>
+            </div>
           </div>
         </>
       )}
