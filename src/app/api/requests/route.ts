@@ -10,7 +10,6 @@ export async function POST(req: Request) {
     const itemName = String(body?.itemName ?? "").trim();
     const details = String(body?.details ?? "").trim();
     const contact = String(body?.contact ?? "").trim();
-    const imageUrl = body?.imageUrl ? String(body.imageUrl) : null;
 
     if (!name || !itemName || !contact) {
       return Response.json(
@@ -27,7 +26,8 @@ export async function POST(req: Request) {
         {
           ok: true,
           emailed: false,
-          error: "Email not configured: missing RESEND_API_KEY or REQUESTS_TO_EMAIL in Vercel (Production).",
+          note:
+            "Email not configured on Vercel. Add RESEND_API_KEY and REQUESTS_TO_EMAIL (Production) then redeploy.",
         },
         { status: 200 }
       );
@@ -35,6 +35,7 @@ export async function POST(req: Request) {
 
     const resend = new Resend(resendKey);
 
+    // IMPORTANT: before verifying a domain, Resend often only allows sending to your own account/verified email.
     const result = await resend.emails.send({
       from: "My Shop <onboarding@resend.dev>",
       to: toEmail,
@@ -46,11 +47,6 @@ export async function POST(req: Request) {
           <p><b>Item:</b> ${escapeHtml(itemName)}</p>
           <p><b>Details:</b><br/>${escapeHtml(details).replace(/\n/g, "<br/>")}</p>
           <p><b>Contact:</b> ${escapeHtml(contact)}</p>
-          ${
-            imageUrl
-              ? `<p><b>Image URL:</b> <a href="${imageUrl}">${imageUrl}</a></p>`
-              : "<p><b>Image:</b> (none)</p>"
-          }
         </div>
       `,
     });
@@ -62,7 +58,7 @@ export async function POST(req: Request) {
       );
     }
 
-    return Response.json({ ok: true, emailed: true }, { status: 200 });
+    return Response.json({ ok: true, emailed: true, note: "Email sent" }, { status: 200 });
   } catch (err: any) {
     return Response.json(
       { ok: false, emailed: false, error: err?.message ?? "Request failed" },
